@@ -1,14 +1,27 @@
 {
     "name": "wspackage",
     "version": "0.1.0",
-    "description": "",
+    "description": "WebSocket Package",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "example": "node ./example.js"
     },
-    "author": "",
-    "license": "ISC",
+    "repository": {
+		"type": "git",
+		"url": "git+https://github.com/brchen777/wspackage.git"
+	},
+	"keywords": [
+        "websocket",
+        "nodejs",
+        "browser"
+	],
+    "author": "brchen777",
+    "license": "WTFPL",
+    "bugs": {
+		"url": "https://github.com/brchen777/wspackage/issues"
+	},
+	"homepage": "https://github.com/brchen777/wspackage#readme",
     "dependencies": {
         "base32": "0.0.6",
         "websocket": "^1.0.26"
