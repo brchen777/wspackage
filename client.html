@@ -37,6 +37,10 @@
 				})
 				.on( 'say_hello', (e)=>{
 					console.log(e);
+				})
+				.on( 'say-good-bye', (e)=>{
+					console.log(e);
+					conn.close();
 				});
 			})();
 		</script>
