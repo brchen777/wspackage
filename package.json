@@ -1,0 +1,22 @@
+{
+    "name": "wspackage",
+    "version": "0.1.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "example": "node ./example.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "base32": "0.0.6",
+        "websocket": "^1.0.26"
+    },
+    "devDependencies": {
+        "eslint": "^5.3.0",
+        "eslint-config-airbnb-base": "^13.1.0",
+        "eslint-plugin-es-beautifier": "^1.0.1",
+        "eslint-plugin-import": "^2.14.0"
+    }
+}
