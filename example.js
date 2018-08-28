@@ -4,37 +4,36 @@
     const { wsServer } = require('./index.js');
 
     const ws = wsServer({
-        port: 8080,
-        host: '127.0.0.1',
-
-        requestListener: (req, res) => {
-            console.log(`[${new Date()}}]: Received request for ${req.url}`);
-            res.writeHead(404);
-            res.end();
-        },
-        listenCallback: () => {
-            console.log(`[${new Date()}]: Server is listening on port 8080`);
-        }
+        port: 1234,
+        host: '0.0.0.0'
     });
 
-    ws.on('open', (socket) => {
+    ws.on('listen', (eventInfo) => {
+        // trigger say_hello
+        ws.emit('say_hello', 'brchen777', 'hello world');
+    });
+
+    ws.on('open', (eventInfo) => {
+        const socket = eventInfo.sender;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) onopen`);
     });
 
-    ws.on('message', (socket, data) => {
+    ws.on('message', (eventInfo, data) => {
+        const socket = eventInfo.sender;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) onmessage: ${data}`);
     });
 
-    ws.on('close', (socket, reasonCode, description) => {
+    ws.on('close', (eventInfo, reasonCode, description) => {
+        const socket = eventInfo.sender;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) onclose`);
     });
 
-    ws.on('error', (socket, error) => {
+    ws.on('error', (eventInfo, error) => {
+        const socket = eventInfo.sender;
         console.error(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) onerror: ${error}`);
     });
 
-    ws.on('say_hello', () => {
-        console.log('hello world!');
+    ws.on('say_hello', (eventInfo, name, msg) => {
+        console.log(`[${new Date()}]: Peer onsay_hello: ${name} say ${msg}`);
     });
-    ws.emit('say_hello');
 })();

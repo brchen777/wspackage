@@ -20,7 +20,7 @@
 		WS.onmessage=(eMsg)=>{
 			let msg = eMsg.data;
 			let eventInfo = {
-				type:'data',
+				type:'message',
 				sender:HANDLER,
 				timestamp: (new Date()).getTime(),
 				
@@ -37,7 +37,7 @@
 			
 			
 			
-			HANDLER.__emit('data', eventInfo, eMsg.data);
+			HANDLER.__emit('message', eventInfo, eMsg.data);
 		};
 		
 		HANDLER.emit = (event, ...args)=>{

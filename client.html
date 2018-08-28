@@ -24,7 +24,7 @@
 				let conn = WSPack('ws://192.168.0.10:1234', [])
 				.on( 'open', (e)=>{
 					console.log(e);
-					conn.emit( 'say_hello' );
+					conn.emit( 'say_hello', 'jCloudYU', 'Hi' );
 				})
 				.on( 'close', (e)=>{
 					console.log(e);
