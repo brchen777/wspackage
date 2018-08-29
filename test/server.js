@@ -1,39 +1,45 @@
 (() => {
     'use strict';
 
-    const { wsServer } = require('./index.js');
+    const { wsServer } = require('../index.js');
 
     const ws = wsServer({
         port: 1234,
         host: '0.0.0.0'
     });
 
+    // default event1
     ws.on('listen', (eventInfo) => {
         // trigger say_hello
         ws.emit('say_hello', 'brchen777', 'hello world');
     });
 
+    // default event2
     ws.on('open', (eventInfo) => {
         const socket = eventInfo.sender;
-        console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) onopen`);
+        console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on open`);
     });
 
+    // default event3
     ws.on('message', (eventInfo, data) => {
         const socket = eventInfo.sender;
-        console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) onmessage: ${data}`);
+        console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on message: ${data}`);
     });
 
+    // default event4
     ws.on('close', (eventInfo, reasonCode, description) => {
         const socket = eventInfo.sender;
-        console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) onclose`);
+        console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on close`);
     });
 
+    // default event5
     ws.on('error', (eventInfo, error) => {
         const socket = eventInfo.sender;
-        console.error(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) onerror: ${error}`);
+        console.error(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on error: ${error}`);
     });
 
+    // user register event
     ws.on('say_hello', (eventInfo, name, msg) => {
-        console.log(`[${new Date()}]: Peer onsay_hello: ${name} say ${msg}`);
+        console.log(`[${new Date()}]: Peer on say_hello: ${name} say ${msg}`);
     });
 })();
