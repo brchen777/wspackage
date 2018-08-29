@@ -3,9 +3,15 @@
 
     const { wsServer } = require('../index.js');
 
+    // acceptedProtocol can not use upper-case
     const ws = wsServer({
         port: 1234,
-        host: '0.0.0.0'
+        host: '0.0.0.0',
+        acceptedProtocol: 'test-protocol',
+
+        serverConfig: {
+            autoAcceptConnections: false
+        }
     });
 
     // default event1
