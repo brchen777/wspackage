@@ -22,27 +22,18 @@
 			(()=>{
 				"use strict";
 				
-				let conn = WSPack('ws://192.168.0.10:1234', 'test-protocol')
+				let conn1 = WSPack('ws://192.168.0.10:1234', 'protocol-1')
 				.on( 'open', (e)=>{
 					console.log(e);
-					conn.emit( 'say_hello', 'jCloudYU', 'Hi' );
-				})
-				.on( 'close', (e)=>{
+					conn1.emit( 'say_hello', 'Brchen', 'Hi' );
+					conn1.close();
+				});
+
+				let conn2 = WSPack('ws://192.168.0.10:1234', 'protocol-2')
+				.on( 'open', (e)=>{
 					console.log(e);
-				})
-				.on( 'error', (e)=>{
-					console.log(e);
-				})
-				.on( 'message', (e)=>{
-					console.log(e);
-				})
-				.on( 'say_hello', (e)=>{
-					console.log(e);
-					conn.emit( 'say-good-bye' );
-				})
-				.on( 'say-good-bye', (e)=>{
-					console.log(e);
-					conn.close();
+					conn2.emit( 'say_hello', 'jCloudYU', 'Hi' );
+					conn2.close();
 				});
 			})();
 		</script>
