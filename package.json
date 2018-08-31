@@ -4,23 +4,24 @@
     "description": "WebSocket Package",
     "main": "index.js",
     "scripts": {
-        "test": "node ./test/server.js"
+        "test_basic": "node ./test/basic/server.js",
+        "test_multiple": "node ./test/multiple/server.js"
     },
     "repository": {
-		"type": "git",
-		"url": "git+https://github.com/brchen777/wspackage.git"
-	},
-	"keywords": [
+        "type": "git",
+        "url": "git+https://github.com/brchen777/wspackage.git"
+    },
+    "keywords": [
         "websocket",
         "nodejs",
         "browser"
-	],
+    ],
     "author": "brchen777",
     "license": "WTFPL",
     "bugs": {
-		"url": "https://github.com/brchen777/wspackage/issues"
-	},
-	"homepage": "https://github.com/brchen777/wspackage#readme",
+        "url": "https://github.com/brchen777/wspackage/issues"
+    },
+    "homepage": "https://github.com/brchen777/wspackage#readme",
     "dependencies": {
         "base32": "0.0.6",
         "websocket": "^1.0.26"

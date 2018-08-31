@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>WebSocket Client Test</title>
+	</head>
+	<body>
+		<h1>WebSocket Client Test</h1>
+		<script src="../../browser-client.js"></script>
+		<script>
+			(()=>{
+				"use strict";
+				
+				let conn = WSPack('ws://127.0.0.1:1234', 'test-protocol')
+				.on( 'open', (e)=>{
+					console.log(e);
+					conn.emit( 'say_hello', 'jCloudYU', 'Hi' );
+				})
+				.on( 'close', (e)=>{
+					console.log(e);
+				})
+				.on( 'error', (e)=>{
+					console.log(e);
+				})
+				.on( 'message', (e)=>{
+					console.log(e);
+				})
+				.on( 'say_hello', (name, msg)=>{
+					console.log(`${name} say ${msg}`);
+					conn.emit( 'say-good-bye' );
+				})
+				.on( 'say-good-bye', ()=>{
+					conn.close();
+				});
+			})();
+		</script>
+	</body>
+</html>

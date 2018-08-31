@@ -20,11 +20,21 @@
     // ./server.js
     const { wsServer } = require('wspackage');
 
-    // acceptedProtocol can not use upper-case
+    /*
+        wsServer config structure:
+        {
+            port: @undefined | @number | @string,
+            host: @number | @string,
+            acceptedProtocol: @undefined | @string | [ @string, ... ],
+            serverConfig: @undefined | {
+                ...
+            }
+        }
+    */
     const ws = wsServer({
         port: 1234,
         host: '0.0.0.0',
-        acceptedProtocol: 'test-protocol',
+        acceptedProtocol: ['protocol1', 'protocol2'],
 
         serverConfig: {
             autoAcceptConnections: false
@@ -32,9 +42,9 @@
     });
 
     const callback = (e, ...args) => {
-        console.log(e.type);                // event name
-        console.log(e.sender);              // sender info (socket connection)
-        console.log(e.timestamp);           // new Date()
+        console.log(e.type);        // event name
+        console.log(e.sender);      // sender info (socket connection)
+        console.log(e.timestamp);   // new Date()
         console.log(args);
     };
 
@@ -46,11 +56,11 @@
     ws.send('target_id', 'trigger_event_name', [arg1], [arg2], [...]);    // trigger event (target socket connection)
 
     // wspackage default event
-    ws.on('listen', callback);
-    ws.on('open', callback);
-    ws.on('message', callback);
-    ws.on('close', callback);
-    ws.on('error', callback);
+    ws.on('listen', callback);      // server listen
+    ws.on('open', callback);        // websocket connection open
+    ws.on('message', callback);     // client send message to server
+    ws.on('close', callback);       // websocket connection closed
+    ws.on('error', callback);       // websocket connection throw error
     ```
 
     Client Example (JavaScript):
@@ -63,7 +73,7 @@
             console.log(args);
         };
 
-        let conn = WSPack('ws://127.0.0.1:1234', 'test-protocol')
+        let conn1 = WSPack('ws://127.0.0.1:1234', 'protocol1')
         // user define event name
         .on('trigger_event_name', callback)
         // wspackage default event
@@ -71,9 +81,13 @@
         .on('close', callback)
         .on('error', callback)
         .on('message', callback);
+
+        // websocket connection use another sub protocol
+        let conn2 = WSPack('ws://127.0.0.1:1234', 'protocol2')
+        .on('trigger_event_name', callback);
     })();
     ```
-
+    * acceptedProtocol can only use lowercase in wsServer config.
     * Please refer to [Client Config Options](https://github.com/theturtle32/WebSocket-Node/blob/0b3d4a5eb253132b2219f6f22a420bfe4680e26a/docs/WebSocketClient.md#client-config-options) for serverConfig.
     * Please refer to [Event Emitter](https://nodejs.org/api/events.html) for other event handler usages.
     * Callback parameter in Server side is based on [WebSocketConnection](https://github.com/theturtle32/WebSocket-Node/blob/0b3d4a5eb253132b2219f6f22a420bfe4680e26a/docs/WebSocketConnection.md).
@@ -94,7 +108,7 @@
     > git clone \<project-url\>
 
 * Install dependency package:
-    > npm install
+    > npm install --production
 
 ### Build and Run ###
 
