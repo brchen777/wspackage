@@ -1,6 +1,6 @@
 {
     "name": "wspackage",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "WebSocket Package",
     "main": "index.js",
     "scripts": {

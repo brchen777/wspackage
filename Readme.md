@@ -121,8 +121,14 @@
 
 ### Build and Run ###
 
-* Run test server (use node):
-    > node ./test/server.js
+* Run test basic server (use node):
+    > node ./test/basic/server.js
 
-* Run test server (use npm):
-    > npm run test
+* Run test basic server (use npm):
+    > npm run test_basic
+
+* Run test multiple server (use node):
+    > node ./test/multiple/server.js
+
+* Run test multiple server (use npm):
+    > npm run test_multiple
