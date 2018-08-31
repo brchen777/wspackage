@@ -58,7 +58,7 @@
     // wspackage default event
     ws.on('listen', callback);      // server listen
     ws.on('open', callback);        // websocket connection open
-    ws.on('message', callback);     // client send message to server
+    ws.on('message', callback);     // receive a message from server or client
     ws.on('close', callback);       // websocket connection closed
     ws.on('error', callback);       // websocket connection throw error
 
@@ -88,7 +88,7 @@
 
     // wspackage default event
     conn1.on('open', callback);         // websocket connection open
-    conn1.on('message', callback);      // client send message to server
+    conn1.on('message', callback);      // receive a message from server or client
     conn1.on('close', callback);        // websocket connection closed
     conn1.on('error', callback);        // websocket connection throw error
 
