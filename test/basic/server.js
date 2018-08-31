@@ -47,5 +47,6 @@
     // user register event
     ws.on('say_hello', (eventInfo, name, msg) => {
         console.log(`[${new Date()}]: Peer on say_hello: ${name} say ${msg}`);
+        ws.emit('server_say_good_bye');
     });
 })();

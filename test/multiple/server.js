@@ -14,18 +14,19 @@
         }
     });
 
-    // user register event
-    ws.on('say_hello', (eventInfo, name, msg) => {
-        console.log(`[${new Date()}]: Peer on say_hello: ws_${name} say ${msg}`);
+    const conn1 = ws.protocol('protocol1');
+    conn1.on('open', (eventInfo) => {
+        const socket = eventInfo.sender;
+        console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on open`);
+
+        conn1.emit('say_hello', 'brchen777', 'Hi', 'conn1');
     });
 
-    const pro1 = ws.protocol('protocol1');
-    pro1.on('say_hello', (eventInfo, name, msg) => {
-        console.log(`[${new Date()}]: Peer on say_hello: pro1_${name} say ${msg}`);
-    });
+    const conn2 = ws.protocol('protocol2');
+    conn2.on('open', (eventInfo) => {
+        const socket = eventInfo.sender;
+        console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on open`);
 
-    const pro2 = ws.protocol('protocol2');
-    pro2.on('say_hello', (eventInfo, name, msg) => {
-        console.log(`[${new Date()}]: Peer on say_hello: pro2_${name} say ${msg}`);
+        conn2.emit('say_hello', 'JCloudYu', 'Hi' ,'conn2');
     });
 })();

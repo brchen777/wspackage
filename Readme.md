@@ -17,7 +17,7 @@
 1. Write script file  
     Server Example (NodeJS):
     ```javascript
-    // ./server.js
+    // server.js
     const { wsServer } = require('wspackage');
 
     /*
@@ -48,7 +48,7 @@
         console.log(args);
     };
 
-    // event handler
+    // event handler for all protocols
     ws.on('register_event_name', callback);                               // register event
     ws.once('register_once_event_name', callback);                        // register event once
     ws.off('remove_event_name', callback);                                // remove event
@@ -61,31 +61,40 @@
     ws.on('message', callback);     // client send message to server
     ws.on('close', callback);       // websocket connection closed
     ws.on('error', callback);       // websocket connection throw error
+
+    // event handler for sub protocol
+    const conn1 = ws.protocol('protocol1');
+    conn1.on('trigger_event_name', callback);
+    const conn2 = ws.protocol('protocol2');
+    conn2.on('trigger_event_name', callback);
     ```
 
     Client Example (JavaScript):
     ```javascript
-    (()=>{
-        'use strict';
+    // client.js
 
-        let callback = (e, ...args) => {
-            console.log(e);
-            console.log(args);
-        };
+    let callback = (e, ...args) => {
+        console.log(e);
+        console.log(args);
+    };
 
-        let conn1 = WSPack('ws://127.0.0.1:1234', 'protocol1')
-        // user define event name
-        .on('trigger_event_name', callback)
-        // wspackage default event
-        .on('open', callback)
-        .on('close', callback)
-        .on('error', callback)
-        .on('message', callback);
+    let conn1 = WSPack('ws://127.0.0.1:1234', 'protocol1');
 
-        // websocket connection use another sub protocol
-        let conn2 = WSPack('ws://127.0.0.1:1234', 'protocol2')
-        .on('trigger_event_name', callback);
-    })();
+    // event handler
+    conn1.on('register_event_name', callback);                  // register event
+    conn1.once('register_once_event_name', callback);           // register event once
+    conn1.off('remove_event_name', callback);                   // remove event
+    conn1.emit('trigger_event_name', [arg1], [arg2], [...]);    // trigger event
+
+    // wspackage default event
+    conn1.on('open', callback);         // websocket connection open
+    conn1.on('message', callback);      // client send message to server
+    conn1.on('close', callback);        // websocket connection closed
+    conn1.on('error', callback);        // websocket connection throw error
+
+    // event handler for another sub protocol
+    let conn2 = WSPack('ws://127.0.0.1:1234', 'protocol2');
+    conn2.on('trigger_event_name', callback);
     ```
     * acceptedProtocol can only use lowercase in wsServer config.
     * Please refer to [Client Config Options](https://github.com/theturtle32/WebSocket-Node/blob/0b3d4a5eb253132b2219f6f22a420bfe4680e26a/docs/WebSocketClient.md#client-config-options) for serverConfig.
