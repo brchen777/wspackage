@@ -5,7 +5,6 @@
     const http = require('http');
     const events = require('events');
     const crypto = require('crypto');
-    const base32 = require('base32');
     const mainProtocol = 'wspackage-main_protocol';
 
     const defaultOptions = {
@@ -22,7 +21,7 @@
 
     const getRandomId = (length = 16) => {
         const buffer = crypto.randomBytes(length);
-        return base32.encode(buffer);
+        return buffer.toString('hex');
     };
 
     const isJson = (string) => {
