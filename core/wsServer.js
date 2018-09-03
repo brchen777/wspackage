@@ -19,12 +19,12 @@
         }
     };
 
-    const getRandomId = (length = 16) => {
+    const __getRandomId = (length = 16) => {
         const buffer = crypto.randomBytes(length);
         return buffer.toString('hex');
     };
 
-    const isJson = (string) => {
+    const __isJson = (string) => {
         try {
             JSON.parse(string);
         }
@@ -34,7 +34,7 @@
         return true;
     };
 
-    const socketSendUTF = (socket, event, ...args) => {
+    const __socketSendUTF = (socket, event, ...args) => {
         if (socket === null) {
             return;
         }
@@ -86,23 +86,23 @@
 
             // broadcast
             if (target === null) {
-                Object.entries(wsStructures).forEach(([groupId, wsStructure]) => {
+                Object.values(wsStructures).forEach((wsStructure) => {
                     const { sockets } = wsStructure;
-                    Object.entries(sockets).forEach(([socketId, socket]) => {
-                        socketSendUTF(socket, event, ...args);
+                    Object.values(sockets).forEach((socket) => {
+                        __socketSendUTF(socket, event, ...args);
                     });
                 });
                 return;
             }
 
             // send to target
-            Object.entries(wsStructures).forEach(([groupId, wsStructure]) => {
+            Object.values(wsStructures).forEach((wsStructure) => {
                 const { sockets } = wsStructure;
                 if (Object.keys(sockets).indexOf(target) === -1) {
                     return;
                 }
 
-                socketSendUTF(sockets[target], event, ...args);
+                __socketSendUTF(sockets[target], event, ...args);
             });
         };
 
@@ -125,14 +125,14 @@
                 const { sockets: protocolSockets } = wsStructures[protocol];
                 // broadcast
                 if (target === null) {
-                    Object.entries(protocolSockets).forEach(([socketId, socket]) => {
-                        socketSendUTF(socket, event, ...args);
+                    Object.values(protocolSockets).forEach((socket) => {
+                        __socketSendUTF(socket, event, ...args);
                     });
                     return;
                 }
 
                 // send to target
-                socketSendUTF(protocolSockets[target], event, ...args);
+                __socketSendUTF(protocolSockets[target], event, ...args);
             };
 
             service.emit = (event, ...args) => {
@@ -172,7 +172,7 @@
             }
 
             const socket = req.accept(protocol, req.origin);
-            socket.id = getRandomId();
+            socket.id = __getRandomId();
 
             // add socket
             const { sockets: protocolSockets } = wsStructures[protocol];
@@ -189,7 +189,7 @@
                         eventArgs: []
                     };
                 */
-                if (isJson(data)) {
+                if (__isJson(data)) {
                     data = JSON.parse(data);
                     if (data.type === '--wspackage-event') {
                         callOriEmitter(data.event, protocol, socket, ...data.eventArgs);
@@ -224,6 +224,6 @@
             return wsStructures[protocol].service;
         };
 
-        return wsStructures[mainProtocol].service;
+        return mainService;
     };
 })();
