@@ -1,40 +1,17 @@
 {
-    "plugins": ["es-beautifier"],
-    "extends": ["airbnb-base"],
-    "parserOptions": {
-        "ecmaVersion": 2017
-    },
     "env": {
-        "node": true,
-        "mongo": true,
-        "browser": true,
-        "commonjs": true
+        "commonjs": true,
+        "es6": true,
+        "node": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 2017,
+        "sourceType": "module"
     },
     "rules": {
-        "strict": [0],
-        "no-console": [0],
-        "no-continue": [0],
-        "global-require": [0],
-        "no-unused-vars": [0],
-        "linebreak-style": [0],
-        "no-await-in-loop": [0],
-        "no-restricted-syntax": [0],
-        "no-underscore-dangle": [0],
-        "import/no-dynamic-require": [0],
-        "import/newline-after-import": [0],
-        "comma-style": ["error", "last"],
-        "comma-dangle": ["error", "never"],
-        "max-len": ["error", { "code": 150 }],
-        "arrow-body-style": ["error", "always"],
-        "object-shorthand": ["error", "methods"],
-        "no-param-reassign": ["error", { "props": false }],
-        "no-mixed-spaces-and-tabs": ["error", "smart-tabs"],
-        "camelcase": ["error", { "ignoreDestructuring": true }],
-        "no-trailing-spaces": ["error", { "ignoreComments": true }],
-        "no-unused-expressions": ["error", { "allowTernary": true }],
-        "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
-        "brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
-        "indent": ["error", 4, { "SwitchCase": 1, "VariableDeclarator": 2, "MemberExpression": 0 }],
-        "import/no-extraneous-dependencies": ["error", {"devDependencies": true, "optionalDependencies": true, "peerDependencies": true}]
+        "no-console": 0,
+        "no-empty": [1, { "allowEmptyCatch": true }],
+        "indent": ["error", 4, { "SwitchCase": 1, "VariableDeclarator": 2, "MemberExpression": 0 }]
     }
 }

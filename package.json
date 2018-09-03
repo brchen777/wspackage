@@ -1,6 +1,6 @@
 {
     "name": "wspackage",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "description": "WebSocket Package",
     "main": "index.js",
     "scripts": {
@@ -24,11 +24,5 @@
     "homepage": "https://github.com/brchen777/wspackage#readme",
     "dependencies": {
         "websocket": "^1.0.26"
-    },
-    "devDependencies": {
-        "eslint": "^5.3.0",
-        "eslint-config-airbnb-base": "^13.1.0",
-        "eslint-plugin-es-beautifier": "^1.0.1",
-        "eslint-plugin-import": "^2.14.0"
     }
 }
