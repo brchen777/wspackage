@@ -5,7 +5,7 @@
     const http = require('http');
     const events = require('events');
     const crypto = require('crypto');
-    const mainProtocol = 'wspackage-main_protocol';
+    const mainProtocol = '--wspackage-mainProtocol';
 
     const defaultOptions = {
         httpServer: null,
@@ -40,17 +40,17 @@
         }
 
         const dataUTF = JSON.stringify({
-            type: 'wspackage-event',
+            type: '--wspackage-event',
             event,
             eventArgs: args
         });
         socket.sendUTF(dataUTF);
     };
 
-    module.exports = (arg = defaultOptions) => {
-        const options = Object.assign({}, defaultOptions, arg);
-        const { port, host, serverConfig } = options;
-        let { httpServer, acceptedProtocol } = options;
+    module.exports = (option = defaultOptions) => {
+        const config = Object.assign({}, defaultOptions, option);
+        const { port, host, serverConfig } = config;
+        let { httpServer, acceptedProtocol } = config;
         const wsStructures = {};
 
         const callOriEmitter = (event, protocol = mainProtocol, socket = null, ...args) => {
@@ -184,14 +184,14 @@
                 /*
                     check message structure is
                     {
-                        type:'wspackage-event',
+                        type:'--wspackage-event',
                         event: 'tasks-ready',
                         eventArgs: []
                     };
                 */
                 if (isJson(data)) {
                     data = JSON.parse(data);
-                    if (data.type === 'wspackage-event') {
+                    if (data.type === '--wspackage-event') {
                         callOriEmitter(data.event, protocol, socket, ...data.eventArgs);
                         return;
                     }

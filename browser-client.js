@@ -26,7 +26,7 @@
 			
 			try{
 				msg=JSON.parse(eMsg.data);
-				if ( Object(msg) === msg && msg.type === "wspackage-event" ) {
+				if ( Object(msg) === msg && msg.type === "--wspackage-event" ) {
 					eventInfo.type = msg.event;
 					HANDLER.__emit(msg.event, eventInfo, ...msg.eventArgs);
 				}
@@ -67,7 +67,7 @@
 		
 			if ( WS.readyState === WS_READY_STATES.OPEN ) {
 				WS.send(JSON.stringify({
-					type:'wspackage-event',
+					type:'--wspackage-event',
 					event, eventArgs:args
 				}));
 			}
