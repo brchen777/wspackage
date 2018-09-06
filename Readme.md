@@ -67,6 +67,9 @@
     conn1.on('trigger_event_name', callback);
     const conn2 = ws.protocol('protocol2');
     conn2.on('trigger_event_name', callback);
+
+    // other definition in wspackage
+    ws.close();                     // close all websocket connection
     ```
 
     Client Example (JavaScript):
@@ -91,6 +94,9 @@
     conn1.on('message', callback);      // receive a message from server or client
     conn1.on('close', callback);        // websocket connection closed
     conn1.on('error', callback);        // websocket connection throw error
+
+    // other definition in wspackage
+    conn1.close();                      // close websocket connection between protocol1 and server
 
     // event handler for another sub protocol
     let conn2 = WSPack('ws://127.0.0.1:1234', 'protocol2');
@@ -127,8 +133,14 @@
 * Run test basic server (use npm):
     > npm run test_basic
 
-* Run test multiple server (use node):
+* Run test multiple protocol server (use node):
     > node ./test/multiple/server.js
 
-* Run test multiple server (use npm):
+* Run test multiple protocol server (use npm):
     > npm run test_multiple
+
+* Run test shutdown server (use node):
+    > node ./test/shutdown/server.js
+
+* Run test shutdown server (use npm):
+    > npm run test_shutdown

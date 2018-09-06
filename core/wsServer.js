@@ -108,6 +108,17 @@
             });
         };
 
+        mainService.close = async () => {            
+            let ended;
+            const promise = new Promise((resolve)=>{ ended = resolve; });
+            httpServer.once('close', ended);
+
+            wsServer.shutDown();
+            httpServer.close();
+
+            return promise;
+        };
+
         // init event emitter from other accepted protocols service
         if (!Array.isArray(acceptedProtocol)) {
             acceptedProtocol = ((acceptedProtocol) ? [acceptedProtocol] : []);
