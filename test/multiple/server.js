@@ -16,7 +16,7 @@
 
     const conn1 = ws.protocol('protocol1');
     conn1.on('open', (eventInfo) => {
-        const socket = eventInfo.sender;
+        const { sender: socket } = eventInfo;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on open`);
 
         conn1.emit('say_hello', 'brchen777', 'Hi', 'conn1');
@@ -24,7 +24,7 @@
 
     const conn2 = ws.protocol('protocol2');
     conn2.on('open', (eventInfo) => {
-        const socket = eventInfo.sender;
+        const { sender: socket } = eventInfo;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on open`);
 
         conn2.emit('say_hello', 'JCloudYu', 'Hi' ,'conn2');

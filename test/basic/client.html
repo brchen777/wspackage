@@ -12,23 +12,23 @@
 				"use strict";
 				
 				let conn = WSPack('ws://127.0.0.1:1234', 'protocol')
-				.on( 'open', (e)=>{
+				.on('open', (e) => {
 					console.log(e);
-					conn.emit( 'say_hello', 'JCloudYu', 'Hi' );
+					conn.emit('say_hello', 'JCloudYu', 'Hi');
 				})
-				.on( 'close', (e)=>{
-					console.log(e);
-				})
-				.on( 'error', (e)=>{
+				.on('close', (e) => {
 					console.log(e);
 				})
-				.on( 'message', (e)=>{
+				.on('error', (e) => {
 					console.log(e);
 				})
-				.on( 'say_hello', (name, msg)=>{
+				.on('message', (e) => {
+					console.log(e);
+				})
+				.on('say_hello', (name, msg) => {
 					console.log(`${name} say ${msg}`);
 				})
-				.on( 'server_say_good_bye', ()=>{
+				.on('server_say_good_bye', () => {
 					conn.close();
 				});
 			})();

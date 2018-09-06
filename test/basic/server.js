@@ -22,25 +22,25 @@
 
     // default event2
     ws.on('open', (eventInfo) => {
-        const socket = eventInfo.sender;
+        const { sender: socket } = eventInfo;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on open`);
     });
 
     // default event3
     ws.on('message', (eventInfo, data) => {
-        const socket = eventInfo.sender;
+        const { sender: socket } = eventInfo;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on message: ${data}`);
     });
 
     // default event4
     ws.on('close', (eventInfo, reasonCode, description) => {
-        const socket = eventInfo.sender;
+        const { sender: socket } = eventInfo;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on close`);
     });
 
     // default event5
     ws.on('error', (eventInfo, error) => {
-        const socket = eventInfo.sender;
+        const { sender: socket } = eventInfo;
         console.error(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on error: ${error}`);
     });
 

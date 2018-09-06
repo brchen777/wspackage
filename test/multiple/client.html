@@ -12,25 +12,25 @@
 				"use strict";
 				
 				let conn1 = WSPack('ws://127.0.0.1:1234', 'protocol1')
-				.on( 'open', (e)=>{
+				.on('open', (e) => {
 					console.log(e);
 				})
-				.on( 'close', (e)=>{
+				.on('close', (e) => {
 					console.log(e);
 				})
-				.on( 'say_hello', (e, name, msg, from)=>{
+				.on('say_hello', (e, name, msg, from) => {
 					console.log(`${name} say ${msg} from ${from}`);
 					conn1.close();
 				});
 
 				let conn2 = WSPack('ws://127.0.0.1:1234', 'protocol2')
-				.on( 'open', (e)=>{
+				.on('open', (e) => {
 					console.log(e);
 				})
-				.on( 'close', (e)=>{
+				.on('close', (e) => {
 					console.log(e);
 				})
-				.on( 'say_hello', (e, name, msg, from)=>{
+				.on('say_hello', (e, name, msg, from) => {
 					console.log(`${name} say ${msg} from ${from}`);
 					conn2.close();
 				});

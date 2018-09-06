@@ -5,7 +5,9 @@
     const http = require('http');
     const events = require('events');
     const crypto = require('crypto');
-    const mainProtocol = '--wspackage-mainProtocol';
+
+    const __stringType = 'base64';
+    const __mainProtocol = '--wspackage-mainProtocol';
 
     const defaultOptions = {
         httpServer: null,
@@ -19,9 +21,9 @@
         }
     };
 
-    const __getRandomId = (length = 16) => {
+    const __getRandomId = (length = 16, stringType = __stringType) => {
         const buffer = crypto.randomBytes(length);
-        return buffer.toString('hex');
+        return buffer.toString(stringType);
     };
 
     const __isJson = (string) => {
@@ -53,7 +55,7 @@
         let { httpServer, acceptedProtocol } = config;
         const wsStructures = {};
 
-        const callOriEmitter = (event, protocol = mainProtocol, socket = null, ...args) => {
+        const callOriEmitter = (event, protocol = __mainProtocol, socket = null, ...args) => {
             const eventInfo = {
                 type: event,
                 protocol: protocol,
@@ -64,14 +66,14 @@
             wsStructures[protocol].oriEmitter(event, eventInfo, ...args);
 
             // trigger protocol will trigger main protocol
-            if (protocol !== mainProtocol) {
-                wsStructures[mainProtocol].oriEmitter(event, eventInfo, ...args);
+            if (protocol !== __mainProtocol) {
+                wsStructures[__mainProtocol].oriEmitter(event, eventInfo, ...args);
             }
         };
 
         // init event emitter from main service
         const mainService = new events.EventEmitter();
-        wsStructures[mainProtocol] = {
+        wsStructures[__mainProtocol] = {
             service: mainService,
             sockets: {},
             oriEmitter: mainService.emit.bind(mainService)
@@ -82,7 +84,7 @@
         };
 
         mainService.send = (target, event, ...args) => {
-            callOriEmitter(event, mainProtocol, null, ...args);
+            callOriEmitter(event, __mainProtocol, null, ...args);
 
             // broadcast
             if (target === null) {
@@ -119,6 +121,10 @@
                 oriEmitter: service.emit.bind(service)
             };
 
+            service.emit = (event, ...args) => {
+                service.send(null, event, ...args);
+            };
+
             service.send = (target, event, ...args) => {
                 callOriEmitter(event, protocol, null, ...args);
 
@@ -133,10 +139,6 @@
 
                 // send to target
                 __socketSendUTF(protocolSockets[target], event, ...args);
-            };
-
-            service.emit = (event, ...args) => {
-                service.send(null, event, ...args);
             };
         });
 
