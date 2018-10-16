@@ -1,6 +1,6 @@
 {
     "name": "wspackage",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "description": "WebSocket Package",
     "main": "index.js",
     "scripts": {
@@ -24,6 +24,6 @@
     },
     "homepage": "https://github.com/brchen777/wspackage#readme",
     "dependencies": {
-        "websocket": "^1.0.26"
+        "websocket": "^1.0.28"
     }
 }

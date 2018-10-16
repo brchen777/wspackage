@@ -29,6 +29,7 @@
 				if ( Object(msg) === msg && msg.type === "--wspackage-event" ) {
 					eventInfo.type = msg.event;
 					HANDLER.__emit(msg.event, eventInfo, ...msg.eventArgs);
+					return;
 				}
 			} catch(e) {}
 			

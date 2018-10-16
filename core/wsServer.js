@@ -109,14 +109,11 @@
         };
 
         mainService.close = async () => {            
-            let ended;
-            const promise = new Promise((resolve)=>{ ended = resolve; });
-            httpServer.once('close', ended);
-
-            wsServer.shutDown();
-            httpServer.close();
-
-            return promise;
+            return new Promise((resolve) => {
+                wsServer.shutDown();
+                httpServer.close();
+                httpServer.once('close', resolve);
+            });
         };
 
         // init event emitter from other accepted protocols service
@@ -211,7 +208,7 @@
                 }
 
                 // others
-                callOriEmitter('message', protocol, socket, ...data.eventArgs);
+                callOriEmitter('message', protocol, socket, data);
             })
             .on('close', callOriEmitter.bind(null, 'close', protocol, socket))
             .on('close', () => {
