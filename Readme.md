@@ -25,20 +25,13 @@
         {
             port: @undefined | @number | @string,
             host: @number | @string,
-            acceptedProtocol: @undefined | @string | [ @string, ... ],
-            serverConfig: @undefined | {
-                ...
-            }
+            acceptedProtocol: @undefined | @string | [ @string, ... ]
         }
     */
     const ws = wsServer({
         port: 1234,
         host: '0.0.0.0',
-        acceptedProtocol: ['protocol1', 'protocol2'],
-
-        serverConfig: {
-            autoAcceptConnections: false
-        }
+        acceptedProtocol: ['protocol1', 'protocol2']
     });
 
     const callback = (e, ...args) => {
@@ -101,10 +94,8 @@
     conn2.on('trigger_event_name', callback);
     ```
     * acceptedProtocol can only use lowercase in wsServer config.
-    * Please refer to [Client Config Options](https://github.com/theturtle32/WebSocket-Node/blob/0b3d4a5eb253132b2219f6f22a420bfe4680e26a/docs/WebSocketClient.md#client-config-options) for serverConfig.
     * Please refer to [Event Emitter](https://nodejs.org/api/events.html) for other event handler usages.
-    * Callback parameter in Server side is based on [WebSocketConnection](https://github.com/theturtle32/WebSocket-Node/blob/0b3d4a5eb253132b2219f6f22a420bfe4680e26a/docs/WebSocketConnection.md).
-    * Callback parameter in Client side is based on [EventListener](https://developer.mozilla.org/zh-TW/docs/Web/API/EventListener).
+    * Callback parameter is based on [ws](https://github.com/websockets/ws/blob/master/doc/ws.md).
 
 2. Run command line:
     > node server.js

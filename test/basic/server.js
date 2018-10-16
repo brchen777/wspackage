@@ -1,17 +1,13 @@
 (() => {
     'use strict';
 
-    const { wsServer } = require('../../index.js');
+    const { wsServer } = require('../../index');
 
     // acceptedProtocol can not use upper-case
     const ws = wsServer({
         port: 1234,
         host: '0.0.0.0',
-        acceptedProtocol: 'protocol',
-
-        serverConfig: {
-            autoAcceptConnections: false
-        }
+        acceptedProtocol: 'protocol'
     });
 
     // default event1
@@ -27,9 +23,9 @@
     });
 
     // default event3
-    ws.on('close', (eventInfo, reasonCode, description) => {
+    ws.on('close', (eventInfo, code, reason) => {
         const { sender: socket } = eventInfo;
-        console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on close`);
+        console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on close: ${code}`);
     });
 
     // default event4

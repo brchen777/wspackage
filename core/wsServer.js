@@ -1,29 +1,28 @@
 (async () => {
     'use strict';
 
-    const WebSocketServer = require('websocket').server;
+    const WebSocket = require('ws');
     const http = require('http');
     const events = require('events');
     const crypto = require('crypto');
 
-    const __stringType = 'base64';
+    const __stringType = 'base64url';
     const __mainProtocol = '--wspackage-mainProtocol';
-
+    
     const defaultOptions = {
         httpServer: null,
 
         port: 80,
         host: 'localhost',
-        acceptedProtocol: null,
-
-        serverConfig: {
-            autoAcceptConnections: false
-        }
+        acceptedProtocol: null
     };
 
     const __getRandomId = (length = 16, stringType = __stringType) => {
         const buffer = crypto.randomBytes(length);
-        return buffer.toString(stringType);
+        const string = (stringType === 'base64url')
+            ? buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+            : buffer.toString(stringType);
+        return string;
     };
 
     const __isJson = (string) => {
@@ -36,22 +35,22 @@
         return true;
     };
 
-    const __socketSendUTF = (socket, event, ...args) => {
+    const __socketSend = (socket, event, ...args) => {
         if (socket === null) {
             return;
         }
 
-        const dataUTF = JSON.stringify({
+        const dataStr = JSON.stringify({
             type: '--wspackage-event',
             event,
             eventArgs: args
         });
-        socket.sendUTF(dataUTF);
+        socket.send(dataStr);
     };
 
     module.exports = (option = defaultOptions) => {
         const config = Object.assign({}, defaultOptions, option);
-        const { port, host, serverConfig } = config;
+        const { port, host } = config;
         let { httpServer, acceptedProtocol } = config;
         const wsStructures = {};
 
@@ -91,7 +90,7 @@
                 Object.values(wsStructures).forEach((wsStructure) => {
                     const { sockets } = wsStructure;
                     Object.values(sockets).forEach((socket) => {
-                        __socketSendUTF(socket, event, ...args);
+                        __socketSend(socket, event, ...args);
                     });
                 });
                 return;
@@ -104,13 +103,13 @@
                     return;
                 }
 
-                __socketSendUTF(sockets[target], event, ...args);
+                __socketSend(sockets[target], event, ...args);
             });
         };
 
         mainService.close = async () => {            
             return new Promise((resolve) => {
-                wsServer.shutDown();
+                wss.close();
                 httpServer.close();
                 httpServer.once('close', resolve);
             });
@@ -140,13 +139,13 @@
                 // broadcast
                 if (target === null) {
                     Object.values(protocolSockets).forEach((socket) => {
-                        __socketSendUTF(socket, event, ...args);
+                        __socketSend(socket, event, ...args);
                     });
                     return;
                 }
 
                 // send to target
-                __socketSendUTF(protocolSockets[target], event, ...args);
+                __socketSend(protocolSockets[target], event, ...args);
             };
         });
 
@@ -164,35 +163,27 @@
         });
 
         // create websocket server
-        const wsServer = new WebSocketServer(Object.assign({}, serverConfig, { httpServer }));
-        wsServer.on('request', (req) => {
-            const protocols = req.requestedProtocols.slice(0);
-
-            // reject no match protocol
-            let protocol = null;
-            protocols.forEach((pro) => {
-                if (Object.prototype.hasOwnProperty.call(wsStructures, pro)) {
-                    protocol = pro;
-                }
-            });
-
-            if (!protocol) {
-                req.reject();
+        let wssConfig = { server: httpServer, handleProtocols: __handleProtocols };
+        const wss = new WebSocket.Server(wssConfig);
+        wss.on('connection', (ws, req) => {
+            const protocol = ws.protocol;
+            // if protocol is empty, close web socket
+            if (protocol === '') {
+                ws.close();
                 return;
             }
 
-            const socket = req.accept(protocol, req.origin);
+            const socket = ws;
             socket.id = __getRandomId();
+            socket.remoteAddress = req.connection.remoteAddress;
 
             // add socket
             const { sockets: protocolSockets } = wsStructures[protocol];
             protocolSockets[socket.id] = socket;
 
-            socket.on('message', (message) => {
-                let data = message.utf8Data;
-
+            socket.on('message', (data) => {
                 /*
-                    check message structure is
+                    check data structure is
                     {
                         type:'--wspackage-event',
                         event: 'tasks-ready',
@@ -233,6 +224,17 @@
 
             return wsStructures[protocol].service;
         };
+
+        function __handleProtocols(protocols, req) {
+            let protocol = false;
+            protocols.forEach((pro) => {
+                if (Object.prototype.hasOwnProperty.call(wsStructures, pro)) {
+                    protocol = pro;
+                }
+            });
+
+            return protocol;
+        }
 
         return mainService;
     };

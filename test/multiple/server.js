@@ -1,17 +1,13 @@
 (() => {
     'use strict';
 
-    const { wsServer } = require('../../index.js');
+    const { wsServer } = require('../../index');
 
     // acceptedProtocol can not use upper-case
     const ws = wsServer({
         port: 1234,
         host: '0.0.0.0',
-        acceptedProtocol: ['protocol1', 'protocol2'],
-
-        serverConfig: {
-            autoAcceptConnections: false
-        }
+        acceptedProtocol: ['protocol1', 'protocol2']
     });
 
     const conn1 = ws.protocol('protocol1');
