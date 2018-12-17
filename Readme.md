@@ -95,7 +95,7 @@
     ```
     * acceptedProtocol can only use lowercase in wsServer config.
     * Please refer to [Event Emitter](https://nodejs.org/api/events.html) for other event handler usages.
-    * Callback parameter is based on [ws](https://github.com/websockets/ws/blob/master/doc/ws.md).
+    * Callback parameter is based on [ws](https://github.com/websockets/ws/blob/HEAD/doc/ws.md).
 
 2. Run command line:
     > node server.js

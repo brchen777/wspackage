@@ -17,37 +17,6 @@
         acceptedProtocol: null
     };
 
-    const __getRandomId = (length = 16, stringType = __stringType) => {
-        const buffer = crypto.randomBytes(length);
-        const string = (stringType === 'base64url')
-            ? buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
-            : buffer.toString(stringType);
-        return string;
-    };
-
-    const __isJson = (string) => {
-        try {
-            JSON.parse(string);
-        }
-        catch (e) {
-            return false;
-        }
-        return true;
-    };
-
-    const __socketSend = (socket, event, ...args) => {
-        if (socket === null) {
-            return;
-        }
-
-        const dataStr = JSON.stringify({
-            type: '--wspackage-event',
-            event,
-            eventArgs: args
-        });
-        socket.send(dataStr);
-    };
-
     module.exports = (option = defaultOptions) => {
         const config = Object.assign({}, defaultOptions, option);
         const { port, host } = config;
@@ -90,7 +59,7 @@
                 Object.values(wsStructures).forEach((wsStructure) => {
                     const { sockets } = wsStructure;
                     Object.values(sockets).forEach((socket) => {
-                        __socketSend(socket, event, ...args);
+                        __socketSend.call(mainService, socket, event, ...args);
                     });
                 });
                 return;
@@ -103,7 +72,7 @@
                     return;
                 }
 
-                __socketSend(sockets[target], event, ...args);
+                __socketSend.call(mainService, sockets[target], event, ...args);
             });
         };
 
@@ -114,6 +83,9 @@
                 httpServer.once('close', resolve);
             });
         };
+
+        mainService._serializer = __defaultSerializer;
+        mainService._deserializer = __defaultDeserializer;
 
         // init event emitter from other accepted protocols service
         if (!Array.isArray(acceptedProtocol)) {
@@ -139,13 +111,13 @@
                 // broadcast
                 if (target === null) {
                     Object.values(protocolSockets).forEach((socket) => {
-                        __socketSend(socket, event, ...args);
+                        __socketSend.call(mainService, socket, event, ...args);
                     });
                     return;
                 }
 
                 // send to target
-                __socketSend(protocolSockets[target], event, ...args);
+                __socketSend.call(mainService, protocolSockets[target], event, ...args);
             };
         });
 
@@ -189,13 +161,11 @@
                         event: 'tasks-ready',
                         eventArgs: []
                     };
-                */
-                if (__isJson(data)) {
-                    data = JSON.parse(data);
-                    if (data.type === '--wspackage-event') {
-                        callOriEmitter(data.event, protocol, socket, ...data.eventArgs);
-                        return;
-                    }
+                */                
+                data = mainService._deserializer(data);
+                if (Object(data) === data && data.type === '--wspackage-event') {
+                    callOriEmitter(data.event, protocol, socket, ...data.eventArgs);
+                    return;
                 }
 
                 // others
@@ -238,4 +208,33 @@
 
         return mainService;
     };
+
+    function __getRandomId(length = 16, stringType = __stringType) {
+        const buffer = crypto.randomBytes(length);
+        const string = (stringType === 'base64url')
+            ? buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+            : buffer.toString(stringType);
+        return string;
+    }
+
+    function __socketSend(socket, event, ...args) {
+        if (socket === null) {
+            return;
+        }
+
+        const dataStr = this._serializer({
+            type: '--wspackage-event',
+            event,
+            eventArgs: args
+        });
+        socket.send(dataStr);
+    }
+
+    function __defaultSerializer(input) {
+        return JSON.stringify(input);
+    }
+
+    function __defaultDeserializer(input) {
+        return JSON.parse(input);
+    }
 })();

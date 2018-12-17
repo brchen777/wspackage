@@ -8,7 +8,8 @@
 		const HANDLER = new EventEmitter();
 		const WS = new WebSocket(URI, ((!protocol) ? null : protocol));
 		
-		
+		WS._serializer = __DEFAULT_SERIALIZER;
+		WS._deserializer = __DEFAULT_DESERIALIZER;
 		
 		// region [ Handle WS core events ]
 		WS.onopen=__FUNC_TRIGGER_DOM_EVENT.bind(null, HANDLER);
@@ -25,7 +26,7 @@
 			};
 			
 			try{
-				msg=JSON.parse(eMsg.data);
+				msg=WS._deserializer(eMsg.data);
 				if ( Object(msg) === msg && msg.type === "--wspackage-event" ) {
 					eventInfo.type = msg.event;
 					HANDLER.__emit(msg.event, eventInfo, ...msg.eventArgs);
@@ -67,7 +68,7 @@
 			HANDLER.__emit(event, ...args);
 		
 			if ( WS.readyState === WS_READY_STATES.OPEN ) {
-				WS.send(JSON.stringify({
+				WS.send(WS._serializer({
 					type:'--wspackage-event',
 					event, eventArgs:args
 				}));
@@ -95,5 +96,13 @@
 		};
 		
 		sender.__emit(e.type, evtInfo, ...args);
+	}
+
+	function __DEFAULT_SERIALIZER(input) {
+		return JSON.stringify(input);
+	}
+
+	function __DEFAULT_DESERIALIZER(input) {
+		return JSON.parse(input);
 	}
 })(window);
