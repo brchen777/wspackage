@@ -9,6 +9,7 @@
         host: '0.0.0.0',
         acceptedProtocol: ['protocol1', 'protocol2']
     });
+    ws.listen();
 
     const conn1 = ws.protocol('protocol1');
     conn1.on('open', (eventInfo) => {

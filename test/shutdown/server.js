@@ -11,6 +11,7 @@
     };
 
     const ws1 = wsServer(config);
+    ws1.listen();
     const conn1 = ws1.protocol('protocol1');
     conn1.on('open', async (eventInfo) => {
         const { sender: socket } = eventInfo;
@@ -22,6 +23,7 @@
 
         // init ws2 server
         const ws2 = wsServer(config);
+        ws2.listen();
         const conn2 = ws2.protocol('protocol1');
         conn2.on('open', (eventInfo) => {
             const { sender: socket } = eventInfo;

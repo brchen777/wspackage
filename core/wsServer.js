@@ -84,6 +84,18 @@
             });
         };
 
+        mainService.listen = (...args) => {
+            if (args.length > 0) {
+                process.stderr.write('WARN: Note that the listen event will not be triggered if you want to handle port and ip yourself\n');
+                httpServer.listen(...args);
+            }
+            else {
+                httpServer.listen(port, host, () => {
+                    callOriEmitter('listen');
+                });
+            }
+        };
+
         mainService._serializer = __defaultSerializer;
         mainService._deserializer = __defaultDeserializer;
 
@@ -129,11 +141,6 @@
             });
         }
 
-        // http server trigger listen event
-        httpServer.listen(port, host, () => {
-            callOriEmitter('listen');
-        });
-
         // create websocket server
         let wssConfig = { server: httpServer, handleProtocols: __handleProtocols };
         const wss = new WebSocket.Server(wssConfig);
@@ -161,7 +168,7 @@
                         event: 'tasks-ready',
                         eventArgs: []
                     };
-                */                
+                */
                 data = mainService._deserializer(data);
                 if (Object(data) === data && data.type === '--wspackage-event') {
                     callOriEmitter(data.event, protocol, socket, ...data.eventArgs);

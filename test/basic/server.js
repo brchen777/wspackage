@@ -9,6 +9,7 @@
         host: '0.0.0.0',
         acceptedProtocol: 'protocol'
     });
+    ws.listen();
 
     // default event1
     ws.on('listen', (eventInfo) => {

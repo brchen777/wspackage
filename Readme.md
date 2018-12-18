@@ -23,16 +23,22 @@
     /*
         wsServer config structure:
         {
+            httpServer: @undefined | @http.Server
             port: @undefined | @number | @string,
             host: @number | @string,
             acceptedProtocol: @undefined | @string | [ @string, ... ]
         }
     */
     const ws = wsServer({
+        httpServer: http.createServer((req, res) => {
+            res.writeHead(404);
+            res.end();
+        }),
         port: 1234,
         host: '0.0.0.0',
         acceptedProtocol: ['protocol1', 'protocol2']
     });
+    ws.listen();
 
     const callback = (e, ...args) => {
         console.log(e.type);        // event name
