@@ -11,7 +11,7 @@
 			(()=>{
 				"use strict";
 				
-				let conn = WSPack('ws://127.0.0.1:1234', 'protocol')
+				let conn = WSPack('ws://127.0.0.1:1234', ['protocolA', 'protocolB'])
 				.on('open', (e) => {
 					console.log(e);
 					conn.emit('say_hello', 'JCloudYu', 'Hi');

@@ -3,17 +3,19 @@
 
     const { wsServer } = require('../../index');
 
-    // acceptedProtocol can not use upper-case
+    // if acceptedProtocol is undefined, you should use protocol function to set sub protocol
     const config = {
         port: 1234,
-        host: '0.0.0.0',
-        acceptedProtocol: ['protocol1', 'protocol2']
+        host: '0.0.0.0'
     };
 
     const ws1 = wsServer(config);
     ws1.listen();
-    const conn1 = ws1.protocol('protocol1');
-    conn1.on('open', async (eventInfo) => {
+
+    // protocol function
+    const conn1 = ws1.protocol('protocolA');
+    conn1
+    .on('open', async (eventInfo) => {
         const { sender: socket } = eventInfo;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on conn1 open`);
         conn1.emit('say_hello', 'server conn1');
@@ -24,8 +26,10 @@
         // init ws2 server
         const ws2 = wsServer(config);
         ws2.listen();
-        const conn2 = ws2.protocol('protocol1');
-        conn2.on('open', (eventInfo) => {
+
+        const conn2 = ws2.protocol('protocolA');
+        conn2
+        .on('open', (eventInfo) => {
             const { sender: socket } = eventInfo;
             console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on conn2 open`);
             conn2.emit('say_hello', 'server conn2');

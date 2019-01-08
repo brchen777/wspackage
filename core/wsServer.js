@@ -7,11 +7,10 @@
     const crypto = require('crypto');
 
     const __stringType = 'base64url';
-    const __mainProtocol = '--wspackage-mainProtocol';
+    const __defaultProtocol = '--wspackage-defaultProtocol';
     
     const defaultOptions = {
         httpServer: null,
-
         port: 80,
         host: 'localhost',
         acceptedProtocol: null
@@ -22,83 +21,24 @@
         const { port, host } = config;
         let { httpServer, acceptedProtocol } = config;
         const wsStructures = {};
+        let __acceptEverything = false;
 
-        // init event emitter from main service
-        const mainService = new events.EventEmitter();
-        wsStructures[__mainProtocol] = {
-            service: mainService,
-            sockets: {},
-            oriEmitter: mainService.emit.bind(mainService)
-        };
+        // init default protocol structure
+        const defaultStructure = __initDefaultStructure();
+        const { service: defaultService } = defaultStructure
+        wsStructures[__defaultProtocol] = defaultStructure;
 
-        mainService.emit = (event, ...args) => {
-            mainService.send(null, event, ...args);
-        };
-
-        mainService.send = (target, event, ...args) => {
-            __callOriEmitter(event, __mainProtocol, null, ...args);
-
-            // broadcast
-            if (target === null) {
-                Object.values(wsStructures).forEach((wsStructure) => {
-                    const { sockets } = wsStructure;
-                    Object.values(sockets).forEach((socket) => {
-                        __socketSend.call(mainService, socket, event, ...args);
-                    });
-                });
-                return;
-            }
-
-            // send to target
-            Object.values(wsStructures).forEach((wsStructure) => {
-                const { sockets } = wsStructure;
-                if (Object.keys(sockets).indexOf(target) === -1) {
-                    return;
-                }
-
-                __socketSend.call(mainService, sockets[target], event, ...args);
-            });
-        };
-
-        mainService.close = async () => {            
-            return new Promise((resolve) => {
-                wss.close();
-                httpServer.close();
-                httpServer.once('close', resolve);
-            });
-        };
-
-        mainService.listen = (...args) => {
-            if (args.length > 0) {
-                process.stderr.write('WARN: Note that the listen event will not be triggered if you want to handle port and ip yourself\n');
-                httpServer.listen(...args);
-            }
-            else {
-                httpServer.listen(port, host, () => {
-                    __callOriEmitter('listen');
-                });
-            }
-        };
-
-        mainService.protocol = (protocol) => {
-            // init event emitter if acceptedProtocol is empty
-            if (!wsStructures[protocol]) {
-                wsStructures[protocol] = __initService(protocol);
-            }
-
-            return wsStructures[protocol].service;
-        };
-
-        mainService._serializer = __defaultSerializer;
-        mainService._deserializer = __defaultDeserializer;
-
-        // init event emitter from other accepted protocols service
+        // init other accepted protocols structure
         if (!Array.isArray(acceptedProtocol)) {
-            acceptedProtocol = ((acceptedProtocol) ? [acceptedProtocol] : []);
+            acceptedProtocol = ((acceptedProtocol) ? [acceptedProtocol] : [__defaultProtocol]);
         }
-
-        acceptedProtocol.forEach((protocol) => {
-            wsStructures[protocol] = __initService(protocol);
+        acceptedProtocol
+        .filter((protocol) => {
+            __acceptEverything = (protocol === '*');
+            return ((protocol !== __defaultProtocol) && (protocol !== '*'));
+        })
+        .forEach((protocol) => {
+            wsStructures[protocol] = __initStructure(protocol);
         });
 
         // create http server
@@ -113,8 +53,8 @@
         let wssConfig = { server: httpServer, handleProtocols: __handleProtocols };
         const wss = new WebSocket.Server(wssConfig);
         wss.on('connection', (ws, req) => {
-            const protocol = ws.protocol;
-            // if protocol is empty, close web socket
+            let protocol = __switchProtocol(ws.protocol);
+            // close web socket if protocol is empty string
             if (protocol === '') {
                 ws.close();
                 return;
@@ -128,7 +68,8 @@
             const { sockets: protocolSockets } = wsStructures[protocol];
             protocolSockets[socket.id] = socket;
 
-            socket.on('message', (data) => {
+            socket
+            .on('message', (data) => {
                 /*
                     check data structure is
                     {
@@ -137,7 +78,7 @@
                         eventArgs: []
                     };
                 */
-                data = mainService._deserializer(data);
+                data = defaultService._deserializer(data);
                 if (Object(data) === data && data.type === '--wspackage-event') {
                     __callOriEmitter(data.event, protocol, socket, ...data.eventArgs);
                     return;
@@ -157,9 +98,22 @@
             __callOriEmitter('open', protocol, socket);
         });
 
-        return mainService;
+        return defaultService;
 
-        function __callOriEmitter(event, protocol = __mainProtocol, socket = null, ...args) {
+        // update protocol to specified structure
+        function __switchProtocol(protocol) {
+            let result = '';
+            const structureKeys = Object.keys(wsStructures);
+            if (structureKeys.includes(protocol)) {
+                result = protocol;
+            }
+            else if (__acceptEverything) {
+                result = __defaultProtocol;
+            }
+            return result;
+        }
+
+        function __callOriEmitter(event, protocol = __defaultProtocol, socket = null, ...args) {
             const eventInfo = {
                 type: event,
                 protocol: protocol,
@@ -169,13 +123,87 @@
 
             wsStructures[protocol].oriEmitter(event, eventInfo, ...args);
 
-            // trigger protocol will trigger main protocol
-            if (protocol !== __mainProtocol) {
-                wsStructures[__mainProtocol].oriEmitter(event, eventInfo, ...args);
+            // trigger protocol will trigger default protocol
+            if (protocol !== __defaultProtocol) {
+                wsStructures[__defaultProtocol].oriEmitter(event, eventInfo, ...args);
             }
         }
 
-        function __initService(protocol) {
+        function __initDefaultStructure() {
+            const service = new events.EventEmitter();
+            const wsStructure = {
+                service: service,
+                sockets: {},
+                oriEmitter: service.emit.bind(service)
+            };
+    
+            service.emit = (event, ...args) => {
+                service.send(null, event, ...args);
+            };
+    
+            service.send = (target, event, ...args) => {
+                __callOriEmitter(event, __defaultProtocol, null, ...args);
+    
+                // broadcast
+                if (target === null) {
+                    Object.values(wsStructures).forEach((wsStructure) => {
+                        const { sockets } = wsStructure;
+                        Object.values(sockets).forEach((socket) => {
+                            __socketSend.call(service, socket, event, ...args);
+                        });
+                    });
+                    return;
+                }
+    
+                // send to target
+                Object.values(wsStructures).forEach((wsStructure) => {
+                    const { sockets } = wsStructure;
+                    if (Object.keys(sockets).includes(target)) {
+                        return;
+                    }
+    
+                    __socketSend.call(service, sockets[target], event, ...args);
+                });
+            };
+    
+            service.close = async () => {            
+                return new Promise((resolve) => {
+                    wss.close();
+                    httpServer.close();
+                    httpServer.once('close', resolve);
+                });
+            };
+    
+            service.listen = (...args) => {
+                if (args.length > 0) {
+                    process.stderr.write('WARN: Note that the listen event will not be triggered if you want to handle port and ip yourself\n');
+                    httpServer.listen(...args);
+                }
+                else {
+                    httpServer.listen(port, host, () => {
+                        __callOriEmitter('listen');
+                    });
+                }
+            };
+    
+            service.protocol = (protocol) => {
+                if (protocol === '*') {
+                    return wsStructures[__defaultProtocol].service;
+                }
+
+                // init structure if it is undefined
+                let wsStructure = wsStructures[protocol] || __initStructure(protocol);
+                wsStructures[protocol] = wsStructure;    
+                return wsStructure.service;
+            };
+    
+            service._serializer = __defaultSerializer;
+            service._deserializer = __defaultDeserializer;
+            return wsStructure;
+        }
+
+        function __initStructure(protocol) {
+            const defaultService = wsStructures[__defaultProtocol].service;
             const service = new events.EventEmitter();
             const wsStructure = {
                 service: service,
@@ -194,27 +222,35 @@
                 // broadcast
                 if (target === null) {
                     Object.values(protocolSockets).forEach((socket) => {
-                        __socketSend.call(mainService, socket, event, ...args);
+                        __socketSend.call(defaultService, socket, event, ...args);
                     });
                     return;
                 }
     
                 // send to target
-                __socketSend.call(mainService, protocolSockets[target], event, ...args);
+                __socketSend.call(defaultService, protocolSockets[target], event, ...args);
             };
 
+            service._serializer = __defaultSerializer;
+            service._deserializer = __defaultDeserializer;
             return wsStructure;
         }
-    
+
+        // set Sec-WebSocket-Protocol
         function __handleProtocols(protocols) {
-            let protocol = false;
-            protocols.forEach((pro) => {
-                if (Object.prototype.hasOwnProperty.call(wsStructures, pro)) {
-                    protocol = pro;
+            let result = false;
+            const structureKeys = Object.keys(wsStructures);
+            protocols.forEach((protocol) => {
+                if (structureKeys.includes(protocol)) {
+                    result = protocol;
+                    return;
                 }
             });
 
-            return protocol;
+            if (!result && __acceptEverything) {
+                result = Array.isArray(protocols) ? protocols[0] : protocols;
+            }
+            return result;
         }
     };
 

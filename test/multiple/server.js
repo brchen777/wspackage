@@ -3,15 +3,24 @@
 
     const { wsServer } = require('../../index');
 
-    // acceptedProtocol can not use upper-case
+    // acceptedProtocol can not use upper-case ('*' means all)
     const ws = wsServer({
         port: 1234,
         host: '0.0.0.0',
-        acceptedProtocol: ['protocol1', 'protocol2']
+        acceptedProtocol: ['*']
     });
     ws.listen();
 
-    const conn1 = ws.protocol('protocol1');
+    ws
+    .on('listen', (eventInfo) => {
+        // trigger say_hello
+        ws.emit('say_hello', 'Server', 'hello world');
+    })
+    .on('say_hello', (eventInfo, name, msg) => {
+        console.log(`[${new Date()}]: Peer on say_hello: ${name} say ${msg}`);
+    });
+
+    const conn1 = ws.protocol('protocolA');
     conn1.on('open', (eventInfo) => {
         const { sender: socket } = eventInfo;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on open`);
@@ -19,7 +28,7 @@
         conn1.emit('say_hello', 'brchen777', 'Hi', 'conn1');
     });
 
-    const conn2 = ws.protocol('protocol2');
+    const conn2 = ws.protocol('protocolB');
     conn2.on('open', (eventInfo) => {
         const { sender: socket } = eventInfo;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on open`);

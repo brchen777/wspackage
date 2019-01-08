@@ -26,8 +26,10 @@
             httpServer: @undefined | @http.Server
             port: @undefined | @number | @string,
             host: @number | @string,
-            acceptedProtocol: @undefined | @string | [ @string, ... ]
+            acceptedProtocol: @string | [ @string, ... ]
         }
+
+        Note: If acceptedProtocol is undefined, you should use protocol function to set sub protocol
     */
     const ws = wsServer({
         httpServer: http.createServer((req, res) => {

@@ -6,7 +6,9 @@
 	
 	window.WSPack=(URI, protocol=null)=>{
 		const HANDLER = new EventEmitter();
-		const WS = new WebSocket(URI, ((!protocol) ? null : protocol));
+		const CONN_INFO = [URI];
+		if (protocol !== null) CONN_INFO.push(protocol);
+		const WS = new WebSocket(...CONN_INFO);
 		
 		HANDLER._serializer = __DEFAULT_SERIALIZER;
 		HANDLER._deserializer = __DEFAULT_DESERIALIZER;

@@ -11,14 +11,14 @@
 			(()=>{
 				"use strict";
 				
-				let conn1 = WSPack('ws://127.0.0.1:1234', 'protocol1')
+				let conn1 = WSPack('ws://127.0.0.1:1234', 'protocolA')
 				.on('open', (e) => {
 					console.log('conn1 open');
 				})
 				.on('close', (e) => {
 					console.log('conn1 close');
 
-					let conn2 = WSPack('ws://127.0.0.1:1234', 'protocol1')
+					let conn2 = WSPack('ws://127.0.0.1:1234', 'protocolA')
 					.on('open', (e) => {
 						console.log('conn2 open');
 					})
