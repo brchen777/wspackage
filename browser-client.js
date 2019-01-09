@@ -17,8 +17,8 @@
 		WS.onopen=__FUNC_TRIGGER_DOM_EVENT.bind(null, HANDLER);
 		WS.onclose=__FUNC_TRIGGER_DOM_EVENT.bind(null, HANDLER);
 		WS.onerror=__FUNC_TRIGGER_DOM_EVENT.bind(null, HANDLER);
-		WS.onmessage=(eMsg)=>{
-			let msg = eMsg.data;
+		WS.onmessage=async (eMsg)=>{
+			let msg = (eMsg.data instanceof Blob) ? (await (new Response(eMsg.data).arrayBuffer())) : eMsg.data;
 			let eventInfo = {
 				type:'message',
 				sender:HANDLER,
@@ -28,7 +28,7 @@
 			};
 			
 			try{
-				msg=HANDLER._deserializer(eMsg.data);
+				msg=HANDLER._deserializer(msg);
 				if ( Object(msg) === msg && msg.type === "--wspackage-event" ) {
 					eventInfo.type = msg.event;
 					HANDLER.__emit(msg.event, eventInfo, ...msg.eventArgs);
@@ -38,7 +38,7 @@
 			
 			
 			
-			HANDLER.__emit('message', eventInfo, eMsg.data);
+			HANDLER.__emit('message', eventInfo, msg);
 		};
 		// endregion
 		
