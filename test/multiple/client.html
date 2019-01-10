@@ -18,7 +18,10 @@
 				.on('close', (e) => {
 					console.log(e);
 				})
-				.on('say_hello', (e, name, msg, from) => {
+				.on('say_hello1', (e, name, msg, from) => {
+					console.log(`${name} say ${msg} from ${from}`);
+				})
+				.on('say_hello2', (e, name, msg, from) => {
 					console.log(`${name} say ${msg} from ${from}`);
 					conn1.close();
 				});
@@ -30,7 +33,10 @@
 				.on('close', (e) => {
 					console.log(e);
 				})
-				.on('say_hello', (e, name, msg, from) => {
+				.on('say_hello1', (e, name, msg, from) => {
+					console.log(`${name} say ${msg} from ${from}`);
+				})
+				.on('say_hello2', (e, name, msg, from) => {
 					console.log(`${name} say ${msg} from ${from}`);
 					conn2.close();
 				});

@@ -158,10 +158,8 @@
                 // send to target
                 Object.values(wsStructures).forEach((wsStructure) => {
                     const { sockets } = wsStructure;
-                    if (Object.keys(sockets).includes(target)) {
-                        return;
-                    }
-    
+                    if (!Object.keys(sockets).includes(target)) return;
+                    
                     __socketSend.call(service, sockets[target], event, ...args);
                 });
             };

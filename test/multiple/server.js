@@ -16,7 +16,7 @@
         // trigger say_hello
         ws.emit('say_hello', 'Server', 'hello world');
     })
-    .on('say_hello', (eventInfo, name, msg) => {
+    .on('say_hello1', (eventInfo, name, msg) => {
         console.log(`[${new Date()}]: Peer on say_hello: ${name} say ${msg}`);
     });
 
@@ -25,7 +25,8 @@
         const { sender: socket } = eventInfo;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on open`);
 
-        conn1.emit('say_hello', 'brchen777', 'Hi', 'conn1');
+        conn1.emit('say_hello1', 'brchen777', 'Hi1', 'conn1');
+        ws.send(socket.id, 'say_hello2', 'brchen777', 'Hi2', 'conn1');
     });
 
     const conn2 = ws.protocol('protocolB');
@@ -33,6 +34,7 @@
         const { sender: socket } = eventInfo;
         console.log(`[${new Date()}]: Peer ${socket.remoteAddress} (${socket.id}) on open`);
 
-        conn2.emit('say_hello', 'JCloudYu', 'Hi' ,'conn2');
+        conn2.emit('say_hello1', 'JCloudYu', 'Hi1' ,'conn2');
+        ws.send(socket.id, 'say_hello2', 'JCloudYu', 'Hi2', 'conn2');
     });
 })();
