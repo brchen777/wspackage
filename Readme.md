@@ -2,12 +2,6 @@
 
 ## For user ##
 
-### Use script in html ###
-
-```html
-<script src="./browser-client.js"></script>
-```
-
 ### Install package ###
 
 > npm i wspackage
@@ -72,7 +66,7 @@
     ws.close();                     // close all websocket connection
     ```
 
-    Client Example (JavaScript):
+    Client Example (JavaScript ES6):
     ```javascript
     // client.js
     import { WSPack } from './browser-client.esm.js';
