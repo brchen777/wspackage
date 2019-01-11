@@ -6,8 +6,9 @@
 	</head>
 	<body>
 		<h1>Shutdown Test</h1>
-		<script src="../../browser-client.js"></script>
-		<script>
+		<script type='module'>
+			import { WSPack } from '../../browser-client.esm.js';
+			
 			(()=>{
 				"use strict";
 				

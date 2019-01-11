@@ -75,6 +75,7 @@
     Client Example (JavaScript):
     ```javascript
     // client.js
+    import { WSPack } from './browser-client.esm.js';
 
     let callback = (e, ...args) => {
         console.log(e);
